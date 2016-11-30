@@ -2,6 +2,7 @@ package gojenkins
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
@@ -42,6 +43,13 @@ func (jenkins *Jenkins) buildUrl(path string, params url.Values) (requestUrl str
 }
 
 func (jenkins *Jenkins) sendRequest(req *http.Request) (*http.Response, error) {
+	cfg := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+	http.DefaultClient.Transport = &http.Transport{
+		TLSClientConfig: cfg,
+	}
+
 	if jenkins.auth != nil {
 		req.SetBasicAuth(jenkins.auth.Username, jenkins.auth.ApiToken)
 	}
